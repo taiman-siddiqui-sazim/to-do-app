@@ -13,18 +13,18 @@ export default function AddTaskForm({ onSubmit }: AddTaskFormProps) {
     e.preventDefault();
     if (title.trim()) {
       onSubmit({ title });
-      setTitle(""); // Clear input field after submission
+      setTitle(""); // Clear title field
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-4 items-center mb-4">
+    <form onSubmit={handleSubmit} className="flex gap-4 items-center mb-6">
       <Input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Enter a task"
-        className="text-black w-64" // Ensure input text is black and width is restricted
+        placeholder="Enter task title"
+        className="text-black bg-gray-200 w-64" // Light gray background with restricted width
       />
       <Button type="submit" variant="default">
         Add Task

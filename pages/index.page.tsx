@@ -6,7 +6,6 @@ import { Task } from "../types/task";
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  // Load tasks from localStorage when the app starts
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
     if (storedTasks) {
@@ -14,7 +13,6 @@ export default function Home() {
     }
   }, []);
 
-  // Save tasks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
