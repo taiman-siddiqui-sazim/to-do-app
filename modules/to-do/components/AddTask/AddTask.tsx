@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, Input } from "@/shared/components/ui";
+import { IAddTaskProps } from "./AddTask.types";
 
-interface AddTaskFormProps {
-  onSubmit: (task: { title: string }) => void;
-}
-
-export default function AddTaskForm({ onSubmit }: AddTaskFormProps) {
+export const AddTask = ({ onSubmit }: IAddTaskProps) => {
   const [title, setTitle] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
       onSubmit({ title });
-      setTitle(""); // Clear title field
+      setTitle("");
     }
   };
 
@@ -24,11 +20,11 @@ export default function AddTaskForm({ onSubmit }: AddTaskFormProps) {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Enter task title"
-        className="text-black bg-gray-200 w-64" // Light gray background with restricted width
+        className="text-black bg-gray-200 w-64"
       />
       <Button type="submit" variant="default">
         Add Task
       </Button>
     </form>
   );
-}
+};
