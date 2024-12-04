@@ -1,7 +1,5 @@
-import { Task } from "../types/task";
-
 interface TaskListProps {
-  tasks: Task[];
+  tasks: { id: number; title: string; completed: boolean }[];
 }
 
 export default function TaskList({ tasks }: TaskListProps) {
@@ -10,9 +8,9 @@ export default function TaskList({ tasks }: TaskListProps) {
       {tasks.map((task) => (
         <li
           key={task.id}
-          className="p-2 border rounded bg-white shadow-sm w-64 text-black" // Centered and ensures black text
+          className="p-4 border rounded bg-gray-200 shadow-sm w-64 text-black" // Light gray background for tasks
         >
-          {task.title}
+          <h3 className="font-bold">{task.title}</h3>
         </li>
       ))}
     </ul>
