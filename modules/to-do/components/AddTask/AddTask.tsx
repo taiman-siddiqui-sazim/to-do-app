@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button, Input } from "@/shared/components/ui";
-import { IAddTaskProps } from "./AddTask.types";
+import { TAddTaskProps } from "./AddTask.types";
 
-export const AddTask = ({ onSubmit }: IAddTaskProps) => {
+export const AddTask = ({ onSubmit }: TAddTaskProps) => {
   const [title, setTitle] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ export const AddTask = ({ onSubmit }: IAddTaskProps) => {
       />
       <Button 
         type="submit" 
-        className="bg-blue-500 text-white border-black hover:bg-blue-600"
+        className="bg-blue-700 text-white border-black hover:bg-blue-600"
       >
         Add Task
       </Button>

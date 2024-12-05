@@ -1,5 +1,5 @@
-import { Task } from "@/shared/typedefs";
+import { ITask } from "@/shared/typedefs";
 
-export interface ITaskListProps {
-  tasks: Task[];
-}
+export type TTaskListProps = {
+  tasks: ITask[];
+};

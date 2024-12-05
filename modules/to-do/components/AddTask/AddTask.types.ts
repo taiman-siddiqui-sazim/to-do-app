@@ -1,4 +1,3 @@
-export interface IAddTaskProps {
-    onSubmit: (task: { title: string }) => void;
-  }
-  
+export type TAddTaskProps = {
+  onSubmit: (task: { title: string }) => void;
+};

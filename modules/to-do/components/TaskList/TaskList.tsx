@@ -1,6 +1,6 @@
-import { ITaskListProps } from "./TaskList.types";
+import { TTaskListProps } from "./TaskList.types";
 
-export const TaskList = ({ tasks }: ITaskListProps) => {
+export const TaskList = ({ tasks }: TTaskListProps) => {
   return (
     <ul className="mt-4 space-y-2 flex flex-col items-center">
       {tasks.map((task) => (
