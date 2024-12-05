@@ -23,10 +23,18 @@ export const ToDoPageContainer = () => {
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
+  const updateTask = (updatedTask: ITask) => {
+    const updatedTasks: ITask[] = tasks.map((task) =>
+      task.id === updatedTask.id ? updatedTask : task
+    );
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
   return (
     <HomePageLayout>
       <AddTask onSubmit={addTask} />
-      <TaskList tasks={tasks} />
+      <TaskList tasks={tasks} onUpdateTask={updateTask} />
     </HomePageLayout>
   );
 };
