@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { AddTask } from "../components/AddTask/AddTask";
-import { TaskList } from "../components/TaskList/TaskList";
-import { ITask } from "@/shared/typedefs/interfaces";
+import { AddTask } from "../components/AddTask";
+import { TaskList } from "../components/TaskList";
+import { HomePageLayout } from "@/shared/layouts/HomePageLayout";
+import { ITask } from "@/shared/typedefs";
 
 export const ToDoPageContainer = () => {
   const [tasks, setTasks] = useState<ITask[]>([]); 
@@ -23,10 +24,9 @@ export const ToDoPageContainer = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 min-h-screen flex flex-col items-center bg-gray-800">
-      <h1 className="text-3xl font-bold text-white mb-8">To-Do App</h1>
+    <HomePageLayout>
       <AddTask onSubmit={addTask} />
       <TaskList tasks={tasks} />
-    </div>
+    </HomePageLayout>
   );
 };
