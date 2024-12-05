@@ -3,10 +3,9 @@ import type { Config } from 'tailwindcss';
 const config: Config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}', // Includes pages directory
-    './modules/**/*.{js,ts,jsx,tsx,mdx}', // Includes new modules directory
-    './shared/**/*.{js,ts,jsx,tsx,mdx}', // Includes shared components/utilities
-    './app/**/*.{js,ts,jsx,tsx,mdx}', // Includes app directory
+    './pages/**/*.{js,ts,jsx,tsx,mdx}', 
+    './modules/**/*.{js,ts,jsx,tsx,mdx}',
+    './shared/**/*.{js,ts,jsx,tsx,mdx}', 
   ],
   theme: {
     extend: {

@@ -20,9 +20,12 @@ export const AddTask = ({ onSubmit }: IAddTaskProps) => {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Enter task title"
-        className="text-black bg-gray-200 w-64"
+        className="text-black bg-gray-300 w-64"
       />
-      <Button type="submit" variant="default">
+      <Button 
+        type="submit" 
+        className="bg-blue-500 text-white border-black hover:bg-blue-600"
+      >
         Add Task
       </Button>
     </form>
