@@ -1,1 +1,1 @@
-export * from "./EditTask"
+export { EditTask } from "./EditTask"

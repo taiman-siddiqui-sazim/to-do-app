@@ -1,1 +1,1 @@
-export * from "./DeleteTask"
+export { DeleteTask } from "./DeleteTask"
