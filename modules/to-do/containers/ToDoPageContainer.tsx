@@ -31,10 +31,16 @@ export const ToDoPageContainer = () => {
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
+  const deleteTask = (taskId: number) => {
+    const updatedTasks: ITask[] = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
   return (
     <HomePageLayout>
       <AddTask onSubmit={addTask} />
-      <TaskList tasks={tasks} onUpdateTask={updateTask} />
+      <TaskList tasks={tasks} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
     </HomePageLayout>
   );
 };
