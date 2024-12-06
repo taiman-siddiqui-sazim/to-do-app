@@ -20,14 +20,14 @@ import {
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="bg-gray-700">
           <DialogHeader>
-            <DialogTitle>Delete Task</DialogTitle>
+            <DialogTitle className="text-red-500 border-black">Delete Task</DialogTitle>
             <DialogDescription className="text-white">
               Are you sure you want to delete the task "{taskTitle}"? This action
               cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
-            <Button onClick={onClose} className="bg-gray-600 text-white hover:bg-gray-500">
+            <Button onClick={onClose} className="bg-gray-600 text-white hover:bg-gray-500 border-black">
               Cancel
             </Button>
             <Button
@@ -35,7 +35,7 @@ import {
                 onDelete();
                 onClose();
               }}
-              className="bg-red-600 text-white hover:bg-red-500"
+              className="bg-red-700 text-white hover:bg-red-500 border-black"
             >
               Delete
             </Button>
