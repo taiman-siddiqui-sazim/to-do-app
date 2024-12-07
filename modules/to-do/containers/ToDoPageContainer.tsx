@@ -5,7 +5,7 @@ import { HomePageLayout } from "@/shared/layouts/HomePageLayout";
 import { ITask } from "@/shared/typedefs";
 
 export const ToDoPageContainer = () => {
-  const [tasks, setTasks] = useState<ITask[]>([]); 
+  const [tasks, setTasks] = useState<ITask[]>([]);
 
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
@@ -14,13 +14,17 @@ export const ToDoPageContainer = () => {
     }
   }, []);
 
+  
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
   const addTask = (task: { title: string }) => {
     const updatedTasks: ITask[] = [
       ...tasks,
       { id: Date.now(), title: task.title, completed: false },
     ];
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
   const updateTask = (updatedTask: ITask) => {
@@ -28,13 +32,11 @@ export const ToDoPageContainer = () => {
       task.id === updatedTask.id ? updatedTask : task
     );
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
   const deleteTask = (taskId: number) => {
     const updatedTasks: ITask[] = tasks.filter((task) => task.id !== taskId);
     setTasks(updatedTasks);
-    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
   return (
