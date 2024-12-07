@@ -1,1 +1,1 @@
-export * from "./TaskList"
+export { TaskList } from "./TaskList"
