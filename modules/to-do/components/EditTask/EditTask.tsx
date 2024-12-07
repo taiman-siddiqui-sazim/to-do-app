@@ -33,7 +33,7 @@ export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
         <Input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(event) => setTitle(event.target.value)}
           placeholder="Update task title"
           className="mb-4 text-black font-bold bg-gray-200 border-black"
         />
