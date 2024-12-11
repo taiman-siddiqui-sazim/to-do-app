@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Input, Button } from "@/shared/components/ui";
+import { Button } from "@/shared/components/ui";
+import { Textarea } from "@/shared/components/ui";
 import { IEditTaskProps } from "./EditTask.interfaces";
 import {
   Dialog,
@@ -23,32 +24,33 @@ export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-gray-800">
+      <DialogContent className="max-w-lg w-full bg-gray-800 text-white max-h-[80vh] overflow-hidden sm:rounded-lg p-4">
         <DialogHeader>
-          
-          <DialogTitle className="text-blue-500 border-black">Edit Task</DialogTitle>
-          <DialogDescription className="text-white">
-            Modify the task title below.
+          <DialogTitle className="text-lg font-bold text-blue-300 border-b border-gray-700 pb-2">
+            Edit Task
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-200">
+            Modify the task details below.
           </DialogDescription>
         </DialogHeader>
-        <Input
-          type="text"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="Update task title"
-          className="mb-4 text-black font-bold bg-gray-300 border-black"
-        />
-        <div className="flex justify-end gap-2">
+        <div className="p-4 rounded max-h-[20rem] overflow-y-auto scrollbar-thick scrollbar-thumb-gray-700 scrollbar-track-gray-800">
+          <Textarea
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Update task details"
+            className="bg-gray-200 text-gray-900 font-bold min-h-[60px] max-h-[80px] resize-y"
+          />
+        </div>
+        <div className="flex justify-end mt-4 gap-4">
           <Button
             onClick={onClose}
-            className="bg-gray-600 text-white hover:bg-gray-500 border-black text-sm px-4 py-2"
+            className="bg-gray-600 text-white hover:bg-gray-500 px-4 py-2 rounded"
           >
             Cancel
           </Button>
-          
           <Button
             onClick={handleSave}
-            className="bg-blue-800 text-white hover:bg-blue-700 border-black text-base px-5 py-3"
+            className="bg-blue-800 text-white hover:bg-blue-700 px-5 py-2 rounded"
           >
             Save
           </Button>
