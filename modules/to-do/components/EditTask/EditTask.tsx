@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/shared/components/ui";
-import { Textarea } from "@/shared/components/ui";
+import { Button, Textarea } from "@/shared/components/ui";
 import { IEditTaskProps } from "./EditTask.interfaces";
 import {
   Dialog,
@@ -9,15 +8,22 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/shared/components/ui";
+import { HTaskSchema } from "@/shared/typedefs";
 
 export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
   const [title, setTitle] = useState(task.title);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
-    if (title.trim()) {
-      onSave({ ...task, title });
-      onClose();
+    const validationResult = HTaskSchema.safeParse({ title });
+    if (!validationResult.success) {
+      setError(validationResult.error.errors[0].message);
+      return;
     }
+
+    setError(null);
+    onSave({ ...task, title: validationResult.data.title });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -34,6 +40,7 @@ export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
           </DialogDescription>
         </DialogHeader>
         <div className="p-4 rounded max-h-[20rem] overflow-y-auto scrollbar-thick scrollbar-thumb-gray-700 scrollbar-track-gray-800">
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
           <Textarea
             value={title}
             onChange={(event) => setTitle(event.target.value)}
