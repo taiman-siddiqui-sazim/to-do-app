@@ -15,6 +15,12 @@ export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
+
+    if (title.trim() === task.title.trim()) {
+      onClose();
+      return;
+    }
+    
     const validationResult = HTaskSchema.safeParse({ title });
     if (!validationResult.success) {
       setError(validationResult.error.errors[0].message);
