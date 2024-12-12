@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/shared/components/ui";
-import { HTaskSchema } from "@/shared/typedefs";
+import { taskSchema } from "@/shared/typedefs";
 
 export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
   const [title, setTitle] = useState(task.title);
@@ -21,7 +21,7 @@ export const EditTask = ({ task, isOpen, onClose, onSave }: IEditTaskProps) => {
       return;
     }
     
-    const validationResult = HTaskSchema.safeParse({ title });
+    const validationResult = taskSchema.safeParse({ title });
     if (!validationResult.success) {
       setError(validationResult.error.errors[0].message);
       return;

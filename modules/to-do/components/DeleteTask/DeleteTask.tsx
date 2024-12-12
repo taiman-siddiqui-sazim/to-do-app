@@ -14,7 +14,7 @@ export const DeleteTask = ({
   onClose,
   onDelete,
 }: IDeleteTaskProps) => {
-  if (!isOpen) return null;
+    if (!isOpen) return null; 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

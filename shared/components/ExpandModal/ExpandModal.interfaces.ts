@@ -3,3 +3,4 @@ export interface IExpandModalProps {
     title: string;
     onClose: () => void;
   }
+  

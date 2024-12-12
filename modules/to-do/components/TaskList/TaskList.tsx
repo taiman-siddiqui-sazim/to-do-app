@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TTaskListProps } from "./TaskList.types";
-import { ITask } from "@/shared/typedefs";
+import { ITask, MAX_TITLE_LENGTH } from "@/shared/typedefs";
 import { EditTask } from "../EditTask";
 import { DeleteTask } from "../DeleteTask";
 import { Button, Card } from "@/shared/components/ui";
@@ -48,9 +48,9 @@ export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) 
       <Card className={TaskListStyles.card}>
         <ul className="space-y-4">
           {tasks.map((task) => {
-            const isLongTask = task.title.length > 40;
+            const isLongTask = task.title.length > MAX_TITLE_LENGTH;
             const truncatedTitle = isLongTask
-              ? `${task.title.slice(0, 40)}...`
+              ? `${task.title.slice(0, MAX_TITLE_LENGTH)}...`
               : task.title;
 
             return (
@@ -126,7 +126,7 @@ export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) 
       {taskToDelete && (
         <DeleteTask
           taskTitle={taskToDelete.title}
-          isOpen={!!taskToDelete}
+          isOpen={Boolean(taskToDelete)}
           onClose={closeDeleteModal}
           onDelete={() => {
             onDeleteTask(taskToDelete.id);

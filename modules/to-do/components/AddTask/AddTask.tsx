@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Input } from "@/shared/components/ui";
 import { TAddTaskProps } from "./AddTask.types";
-import { HTaskSchema } from "@/shared/typedefs";
+import { taskSchema } from "@/shared/typedefs";
 import { PopUp } from "@/shared/components/PopUp";
 
 export const AddTask = ({ onSubmit }: TAddTaskProps) => {
@@ -12,7 +12,7 @@ export const AddTask = ({ onSubmit }: TAddTaskProps) => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    const validationResult = HTaskSchema.safeParse({ title });
+    const validationResult = taskSchema.safeParse({ title });
     if (!validationResult.success) {
       setError(validationResult.error.errors[0].message);
       return;
@@ -35,7 +35,6 @@ export const AddTask = ({ onSubmit }: TAddTaskProps) => {
         className="flex flex-col sm:flex-row gap-4 items-center mb-6 max-w-md mx-auto"
       >
         <div className="w-full relative">
-          {/* Display error message above the input */}
           {error && (
             <p className="text-red-500 text-sm mb-1 absolute top-[-20px] left-0">
               {error}

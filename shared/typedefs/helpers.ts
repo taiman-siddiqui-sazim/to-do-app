@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const HTaskSchema = z.object({
+export const taskSchema = z.object({
   title: z
     .string()
     .trim() 
