@@ -26,7 +26,7 @@ export const fetchTasksFromApi = async (): Promise<ITask[]> => {
     try {
       const response = await axios.get(API_BASE_URL);
       if (response.status === 200) {
-        return response.data.data; // Assuming the API returns tasks under `data`
+        return response.data.data; 
       }
       throw new Error("Failed to fetch tasks");
     } catch (error: any) {
