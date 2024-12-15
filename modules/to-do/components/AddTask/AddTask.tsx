@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Button, Input } from "@/shared/components/ui";
-import { TAddTaskProps } from "./AddTask.types";
 import { taskSchema } from "@/shared/typedefs";
 import { PopUp } from "@/shared/components/PopUp";
+import { addTaskToApi } from "@/shared/utils/TaskApi";
+import { TAddTaskProps } from "./AddTask.types";
 
-export const AddTask = ({ onSubmit }: TAddTaskProps) => {
+export const AddTask = ({ onTaskAdded }: TAddTaskProps) => {
   const [title, setTitle] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     const validationResult = taskSchema.safeParse({ title });
@@ -19,13 +20,20 @@ export const AddTask = ({ onSubmit }: TAddTaskProps) => {
     }
 
     setError(null);
-    const validatedTask = validationResult.data;
-    onSubmit(validatedTask);
 
-    setTitle("");
-    setShowPopup(true);
+    try {
+      await addTaskToApi(validationResult.data.title);
 
-    setTimeout(() => setShowPopup(false), 2000);
+      setTitle("");
+      setShowPopup(true);
+
+      onTaskAdded();
+
+      setTimeout(() => setShowPopup(false), 2000);
+    } catch (err: any) {
+      console.error("Error adding task:", err);
+      setError(err.message);
+    }
   };
 
   return (
@@ -43,7 +51,7 @@ export const AddTask = ({ onSubmit }: TAddTaskProps) => {
           <Input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(event) => setTitle(event.target.value)}
             placeholder="Enter task title"
             className="text-black font-bold text-lg bg-gray-200 w-full sm:w-96"
           />

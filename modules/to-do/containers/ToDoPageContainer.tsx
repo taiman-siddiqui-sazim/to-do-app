@@ -3,46 +3,44 @@ import { AddTask } from "../components/AddTask";
 import { TaskList } from "../components/TaskList";
 import { HomePageLayout } from "@/shared/layouts/HomePageLayout";
 import { ITask } from "@/shared/typedefs";
+import { fetchTasksFromApi } from "@/shared/utils/TaskApi";
 
 export const ToDoPageContainer = () => {
   const [tasks, setTasks] = useState<ITask[]>([]);
 
-  useEffect(() => {
-    const storedTasks = localStorage.getItem("tasks");
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
+  const fetchTasks = async () => {
+    try {
+      const fetchedTasks = await fetchTasksFromApi();
+      setTasks(fetchedTasks); 
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
     }
-  }, []);
-
-  
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  const addTask = (task: { title: string }) => {
-    const updatedTasks: ITask[] = [
-      ...tasks,
-      { id: Date.now(), title: task.title, completed: false },
-    ];
-    setTasks(updatedTasks);
   };
 
+  useEffect(() => {
+    fetchTasks(); 
+  }, []);
+
   const updateTask = (updatedTask: ITask) => {
-    const updatedTasks: ITask[] = tasks.map((task) =>
+    const updatedTasks = tasks.map((task) =>
       task.id === updatedTask.id ? updatedTask : task
     );
     setTasks(updatedTasks);
   };
 
   const deleteTask = (taskId: number) => {
-    const updatedTasks: ITask[] = tasks.filter((task) => task.id !== taskId);
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
     setTasks(updatedTasks);
   };
 
   return (
     <HomePageLayout>
-      <AddTask onSubmit={addTask} />
-      <TaskList tasks={tasks} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
+      <AddTask onTaskAdded={fetchTasks} />
+      <TaskList
+        tasks={tasks}
+        onUpdateTask={updateTask}
+        onDeleteTask={deleteTask}
+      />
     </HomePageLayout>
   );
 };

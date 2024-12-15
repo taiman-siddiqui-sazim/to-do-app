@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TTaskListProps } from "./TaskList.types";
 import { ITask, MAX_TITLE_LENGTH } from "@/shared/typedefs";
 import { EditTask } from "../EditTask";
@@ -7,10 +7,19 @@ import { Button, Card } from "@/shared/components/ui";
 import { ExpandModal } from "@/shared/components/ExpandModal";
 import { TaskListStyles } from "./TaskList.styles";
 
-export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) => {
+export const TaskList = ({
+  tasks,
+  onUpdateTask,
+  onDeleteTask,
+}: TTaskListProps) => {
+  const [localTasks, setLocalTasks] = useState<ITask[]>(tasks || []);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
   const [expandedTask, setExpandedTask] = useState<ITask | null>(null);
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
 
   const openEditModal = (task: ITask) => {
     setSelectedTask(task);
@@ -41,13 +50,13 @@ export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) 
     onUpdateTask(updatedTask);
   };
 
-  if (tasks.length === 0) return null;
+  if (localTasks.length === 0) return <p>No tasks found.</p>;
 
   return (
     <>
       <Card className={TaskListStyles.card}>
         <ul className="space-y-4">
-          {tasks.map((task) => {
+          {localTasks.map((task) => {
             const isLongTask = task.title.length > MAX_TITLE_LENGTH;
             const truncatedTitle = isLongTask
               ? `${task.title.slice(0, MAX_TITLE_LENGTH)}...`
