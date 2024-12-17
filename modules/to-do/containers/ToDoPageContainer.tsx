@@ -9,10 +9,12 @@ export const ToDoPageContainer = () => {
   const [updatedTask, setUpdatedTask] = useState<ITask | undefined>(undefined); 
 
   const handleTaskAdded = (newTask: ITask) => {
+    console.log("Task added:", newTask);
     setUpdatedTask(newTask); 
   };
 
   const handleTaskUpdated = (editedTask: ITask) => {
+    console.log("Task updated:", editedTask);
     setUpdatedTask(editedTask); 
   };
 

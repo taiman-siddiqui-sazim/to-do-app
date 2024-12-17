@@ -34,9 +34,7 @@ export const EditTask = ({ task, isOpen, onClose, onTaskUpdated }: IEditTaskProp
     try {
       
       const updatedTask = await updateTaskInApi(task.id, validationResult.data.title);
-
       onTaskUpdated(updatedTask);
-
       onClose();
     } catch (err: any) {
       console.error("Error updating task:", err);
