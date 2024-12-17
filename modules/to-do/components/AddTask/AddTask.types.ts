@@ -1,3 +1,5 @@
+import { ITask } from "@/shared/typedefs";
+
 export type TAddTaskProps = {
-  onTaskAdded: (taskId: number) => void; 
+  onTaskAdded: (task: ITask) => void;
 };

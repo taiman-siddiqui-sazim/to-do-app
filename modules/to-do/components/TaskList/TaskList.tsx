@@ -8,7 +8,7 @@ import { ExpandModal } from "@/shared/components/ExpandModal";
 import { TaskListStyles } from "./TaskList.styles";
 import { fetchTasksFromApi } from "@/shared/utils/TaskApi";
 
-export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListProps) => {
+export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListProps) => {
   const [localTasks, setLocalTasks] = useState<ITask[]>([]);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
@@ -23,24 +23,23 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
         console.error("Error fetching tasks:", error);
       }
     };
-
     fetchTasks();
   }, []);
 
   useEffect(() => {
-    if (singleTask) {
+    if (updatedTask) {
       setLocalTasks((prevTasks) => {
-        const taskIndex = prevTasks.findIndex((task) => task.id === singleTask.id);
+        const taskIndex = prevTasks.findIndex((task) => task.id === updatedTask.id);
+        const updatedTasks = [...prevTasks];
         if (taskIndex >= 0) {
-          const updatedTasks = [...prevTasks];
-          updatedTasks[taskIndex] = singleTask; 
-          return updatedTasks;
+          updatedTasks[taskIndex] = updatedTask; 
         } else {
-          return [...prevTasks, singleTask]; 
+          updatedTasks.push(updatedTask); 
         }
+        return updatedTasks;
       });
     }
-  }, [singleTask]);
+  }, [updatedTask]);
 
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
@@ -50,11 +49,6 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
 
   const openExpandModal = (task: ITask) => setExpandedTask(task);
   const closeExpandModal = () => setExpandedTask(null);
-
-  const toggleCompletion = (task: ITask) => {
-    const updatedTask = { ...task, completed: !task.completed };
-    onUpdateTask(updatedTask);
-  };
 
   const handleDelete = (taskId: number) => {
     onDeleteTask(taskId);
@@ -78,7 +72,7 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
                 <input
                   type="checkbox"
                   checked={task.completed}
-                  onChange={() => toggleCompletion(task)}
+                  onChange={() => openEditModal({ ...task, completed: !task.completed })}
                   className={TaskListStyles.checkbox}
                 />
 
@@ -131,10 +125,10 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
       {selectedTask && (
         <EditTask
           task={selectedTask}
-          isOpen={!!selectedTask}
+          isOpen={Boolean(selectedTask)}
           onClose={closeEditModal}
-          onSave={(updatedTask) => {
-            onUpdateTask(updatedTask);
+          onTaskUpdated={(editedTask) => {
+            onUpdateTask(editedTask);
             closeEditModal();
           }}
         />
@@ -143,7 +137,7 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
       {taskToDelete && (
         <DeleteTask
           taskTitle={taskToDelete.title}
-          isOpen={!!taskToDelete}
+          isOpen={Boolean(taskToDelete)}
           onClose={closeDeleteModal}
           onDelete={() => {
             handleDelete(taskToDelete.id);
