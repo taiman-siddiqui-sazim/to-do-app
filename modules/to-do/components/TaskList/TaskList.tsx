@@ -30,20 +30,25 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
   }, []);
 
   useEffect(() => {
-    if (updatedTask) {
-      setLocalTasks((prevTasks) => {
-        const taskIndex = prevTasks.findIndex((task) => task.id === updatedTask.id);
-        const updatedTasks = [...prevTasks];
+    setLocalTasks((prevTasks) => {
+      let updatedTasks = [...prevTasks];
+
+      if (updatedTask) {
+        const taskIndex = updatedTasks.findIndex((task) => task.id === updatedTask.id);
         if (taskIndex >= 0) {
           updatedTasks[taskIndex] = updatedTask; 
         } else {
           updatedTasks.push(updatedTask); 
         }
-        return updatedTasks;
-      });
-    }
-  }, [updatedTask]);
+      }
 
+      if (deletedTaskId !== undefined) {
+        updatedTasks = updatedTasks.filter((task) => task.id !== deletedTaskId); 
+      }
+
+      return updatedTasks;
+    });
+  }, [updatedTask, deletedTaskId]);
 
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
@@ -87,7 +92,7 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
                 <input
                   type="checkbox"
                   checked={task.completed}
-                  onChange={() => toggleCompletion(task)}
+                  onChange={() => openEditModal({ ...task, completed: !task.completed })}
                   className={TaskListStyles.checkbox}
                 />
 
