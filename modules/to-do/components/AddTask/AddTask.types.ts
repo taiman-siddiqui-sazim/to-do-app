@@ -1,3 +1,3 @@
 export type TAddTaskProps = {
-  onTaskAdded: () => void; 
+  onTaskAdded: (taskId: number) => void; 
 };

@@ -22,12 +22,15 @@ export const AddTask = ({ onTaskAdded }: TAddTaskProps) => {
     setError(null);
 
     try {
-      await addTaskToApi(validationResult.data.title);
+      const newTask = await addTaskToApi(validationResult.data.title);
 
-      setTitle("");
-      setShowPopup(true);
-
-      onTaskAdded();
+      if (newTask?.id) {
+        onTaskAdded(newTask.id);
+        setTitle(""); 
+        setShowPopup(true); 
+      } else {
+        throw new Error("Invalid task data returned from API.");
+      }
 
       setTimeout(() => setShowPopup(false), 2000);
     } catch (err: any) {
