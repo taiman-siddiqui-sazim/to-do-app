@@ -50,6 +50,7 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
     });
   }, [updatedTask, deletedTaskId]);
 
+
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
 
@@ -92,7 +93,7 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
                 <input
                   type="checkbox"
                   checked={task.completed}
-                  onChange={() => openEditModal({ ...task, completed: !task.completed })}
+                  onChange={() => toggleCompletion(task)}
                   className={TaskListStyles.checkbox}
                 />
 
