@@ -18,7 +18,10 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
     const fetchTasks = async () => {
       try {
         const tasks = await fetchTasksFromApi();
-        setLocalTasks(tasks as ITask[]);
+        const sortedTasks = (tasks as ITask[]).sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        setLocalTasks(sortedTasks as ITask[]);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
