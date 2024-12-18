@@ -84,3 +84,28 @@ export const deleteTaskFromApi = async (taskId: number): Promise<void> => {
     }
   }
 };
+
+export const updateTaskCompletionInApi = async (
+  taskId: number,
+  completed: boolean
+): Promise<ITask> => {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/${taskId}/update_completion`, {
+      task: { completed },
+    });
+
+    if (response.status === 200) {
+      return response.data.data as ITask; 
+    }
+
+    throw new Error("Failed to update task completion.");
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data?.error || "Failed to update task completion.");
+    } else if (error.request) {
+      throw new Error("No response from server. Please try again.");
+    } else {
+      throw new Error("An error occurred while sending the request.");
+    }
+  }
+};

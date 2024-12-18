@@ -6,7 +6,7 @@ import { DeleteTask } from "../DeleteTask";
 import { Button, Card } from "@/shared/components/ui";
 import { ExpandModal } from "@/shared/components/ExpandModal";
 import { TaskListStyles } from "./TaskList.styles";
-import { fetchTasksFromApi } from "@/shared/utils/TaskApi";
+import { fetchTasksFromApi, updateTaskCompletionInApi } from "@/shared/utils/TaskApi";
 
 export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListProps) => {
   const [localTasks, setLocalTasks] = useState<ITask[]>([]);
@@ -44,6 +44,7 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
     }
   }, [updatedTask]);
 
+
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
 
@@ -52,6 +53,17 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
 
   const openExpandModal = (task: ITask) => setExpandedTask(task);
   const closeExpandModal = () => setExpandedTask(null);
+
+  const toggleCompletion = async (task: ITask) => {
+    try {
+      const updatedTask = await updateTaskCompletionInApi(task.id, !task.completed);
+      setLocalTasks((prevTasks) =>
+        prevTasks.map((t) => (t.id === task.id ? updatedTask : t))
+      );
+    } catch (error) {
+      console.error("Error updating task completion:", error);
+    }
+  };
 
   const handleDelete = (taskId: number) => {
     onDeleteTask(taskId);
@@ -75,12 +87,14 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
                 <input
                   type="checkbox"
                   checked={task.completed}
-                  onChange={() => openEditModal({ ...task, completed: !task.completed })}
+                  onChange={() => toggleCompletion(task)}
                   className={TaskListStyles.checkbox}
                 />
 
                 <span
-                  className={`${TaskListStyles.taskTitle(task.completed)} whitespace-pre-wrap break-words`}
+                  className={`${TaskListStyles.taskTitle(task.completed)} ${
+                    task.completed ? "line-through text-gray-400" : ""
+                  } whitespace-pre-wrap break-words`}
                 >
                   {truncatedTitle}
                 </span>
