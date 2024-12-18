@@ -1,48 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AddTask } from "../components/AddTask";
 import { TaskList } from "../components/TaskList";
 import { HomePageLayout } from "@/shared/layouts/HomePageLayout";
 import { ITask } from "@/shared/typedefs";
+import { deleteTaskFromApi, fetchTasksFromApi } from "@/shared/utils/TaskApi";
 
 export const ToDoPageContainer = () => {
-  const [tasks, setTasks] = useState<ITask[]>([]);
+  const [singleTask, setSingleTask] = useState<ITask | null>(null); 
 
-  useEffect(() => {
-    const storedTasks = localStorage.getItem("tasks");
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
+  const handleTaskAdded = async (taskId: number) => {
+    try {
+      const newTask = await fetchTasksFromApi(taskId);
+      setSingleTask(newTask as ITask); 
+    } catch (error) {
+      console.error("Error fetching added task:", error);
     }
-  }, []);
-
-  
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  const addTask = (task: { title: string }) => {
-    const updatedTasks: ITask[] = [
-      ...tasks,
-      { id: Date.now(), title: task.title, completed: false },
-    ];
-    setTasks(updatedTasks);
   };
 
-  const updateTask = (updatedTask: ITask) => {
-    const updatedTasks: ITask[] = tasks.map((task) =>
-      task.id === updatedTask.id ? updatedTask : task
-    );
-    setTasks(updatedTasks);
+  const handleTaskUpdated = async (task: ITask) => {
+    setSingleTask(task); 
   };
 
-  const deleteTask = (taskId: number) => {
-    const updatedTasks: ITask[] = tasks.filter((task) => task.id !== taskId);
-    setTasks(updatedTasks);
+  const handleTaskDeleted = async (taskId: number) => {
+    try {
+      await deleteTaskFromApi(taskId);
+      setSingleTask(null); 
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   return (
     <HomePageLayout>
-      <AddTask onSubmit={addTask} />
-      <TaskList tasks={tasks} onUpdateTask={updateTask} onDeleteTask={deleteTask} />
+      <AddTask onTaskAdded={handleTaskAdded} />
+      <TaskList
+        singleTask={singleTask} 
+        onUpdateTask={handleTaskUpdated}
+        onDeleteTask={handleTaskDeleted}
+      />
     </HomePageLayout>
   );
 };
