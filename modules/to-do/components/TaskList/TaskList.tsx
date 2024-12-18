@@ -8,7 +8,12 @@ import { ExpandModal } from "@/shared/components/ExpandModal";
 import { TaskListStyles } from "./TaskList.styles";
 import { fetchTasksFromApi, updateTaskCompletionInApi } from "@/shared/utils/TaskApi";
 
-export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListProps) => {
+export const TaskList = ({
+  updatedTask,
+  deletedTaskId,
+  onDeleteTask,
+  onUpdateTask,
+}: TTaskListProps) => {
   const [localTasks, setLocalTasks] = useState<ITask[]>([]);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
@@ -26,6 +31,7 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
         console.error("Error fetching tasks:", error);
       }
     };
+
     fetchTasks();
   }, []);
 
@@ -50,7 +56,6 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
     });
   }, [updatedTask, deletedTaskId]);
 
-
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
 
@@ -69,11 +74,6 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
     } catch (error) {
       console.error("Error updating task completion:", error);
     }
-  };
-
-  const handleDelete = (taskId: number) => {
-    onDeleteTask(taskId);
-    setLocalTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
 
   if (localTasks.length === 0) return <p>No tasks found.</p>;
@@ -159,11 +159,12 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
 
       {taskToDelete && (
         <DeleteTask
+          taskId={taskToDelete.id}
           taskTitle={taskToDelete.title}
           isOpen={Boolean(taskToDelete)}
           onClose={closeDeleteModal}
           onDelete={() => {
-            handleDelete(taskToDelete.id);
+            onDeleteTask(taskToDelete.id);
             closeDeleteModal();
           }}
         />
