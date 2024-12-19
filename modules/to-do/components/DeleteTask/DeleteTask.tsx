@@ -7,14 +7,26 @@ import {
 } from "@/shared/components/ui";
 import { Button, Textarea } from "@/shared/components/ui";
 import { IDeleteTaskProps } from "./DeleteTask.interfaces";
+import { deleteTaskFromApi } from "@/shared/utils/TaskApi";
 
 export const DeleteTask = ({
+  taskId,
   taskTitle,
   isOpen,
   onClose,
   onDelete,
 }: IDeleteTaskProps) => {
-    if (!isOpen) return null; 
+  const handleDelete = async () => {
+    try {
+      await deleteTaskFromApi(taskId); 
+      onDelete(taskId); 
+      onClose(); 
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -43,10 +55,7 @@ export const DeleteTask = ({
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              onDelete();
-              onClose();
-            }}
+            onClick={handleDelete}
             className="bg-red-700 text-white hover:bg-red-500 px-5 py-2 rounded"
           >
             Delete
