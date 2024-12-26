@@ -1,6 +1,7 @@
 export interface IDeleteTaskProps {
-    taskTitle: string;
-    isOpen: boolean;
-    onClose: () => void;
-    onDelete: () => void;
-  }
+  taskId: number; 
+  taskTitle: string; 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onDelete: (taskId: number) => void; 
+}
