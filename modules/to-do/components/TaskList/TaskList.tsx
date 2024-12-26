@@ -6,9 +6,14 @@ import { DeleteTask } from "../DeleteTask";
 import { Button, Card } from "@/shared/components/ui";
 import { ExpandModal } from "@/shared/components/ExpandModal";
 import { TaskListStyles } from "./TaskList.styles";
-import { fetchTasksFromApi } from "@/shared/utils/TaskApi";
+import { fetchTasksFromApi, updateTaskCompletionInApi } from "@/shared/utils/TaskApi";
 
-export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListProps) => {
+export const TaskList = ({
+  updatedTask,
+  deletedTaskId,
+  onDeleteTask,
+  onUpdateTask,
+}: TTaskListProps) => {
   const [localTasks, setLocalTasks] = useState<ITask[]>([]);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
@@ -18,7 +23,10 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
     const fetchTasks = async () => {
       try {
         const tasks = await fetchTasksFromApi();
-        setLocalTasks(tasks as ITask[]);
+        const sortedTasks = (tasks as ITask[]).sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        setLocalTasks(sortedTasks as ITask[]);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -28,19 +36,23 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
   }, []);
 
   useEffect(() => {
-    if (singleTask) {
-      setLocalTasks((prevTasks) => {
-        const taskIndex = prevTasks.findIndex((task) => task.id === singleTask.id);
+    setLocalTasks((prevTasks) => {
+      let updatedTasks = [...prevTasks];
+      if (updatedTask) {
+        const taskIndex = updatedTasks.findIndex((task) => task.id === updatedTask.id);
         if (taskIndex >= 0) {
-          const updatedTasks = [...prevTasks];
-          updatedTasks[taskIndex] = singleTask; 
-          return updatedTasks;
+          updatedTasks[taskIndex] = updatedTask; 
         } else {
-          return [...prevTasks, singleTask]; 
+          updatedTasks.push(updatedTask); 
         }
-      });
-    }
-  }, [singleTask]);
+      }
+
+      if (deletedTaskId !== undefined) {
+        updatedTasks = updatedTasks.filter((task) => task.id !== deletedTaskId); 
+      }
+      return updatedTasks;
+    });
+  }, [updatedTask, deletedTaskId]);
 
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
@@ -51,14 +63,15 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
   const openExpandModal = (task: ITask) => setExpandedTask(task);
   const closeExpandModal = () => setExpandedTask(null);
 
-  const toggleCompletion = (task: ITask) => {
-    const updatedTask = { ...task, completed: !task.completed };
-    onUpdateTask(updatedTask);
-  };
-
-  const handleDelete = (taskId: number) => {
-    onDeleteTask(taskId);
-    setLocalTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  const toggleCompletion = async (task: ITask) => {
+    try {
+      const updatedTask = await updateTaskCompletionInApi(task.id, !task.completed);
+      setLocalTasks((prevTasks) =>
+        prevTasks.map((task_completed) => (task_completed.id === task.id ? updatedTask : task_completed))
+      );
+    } catch (error) {
+      console.error("Error updating task completion:", error);
+    }
   };
 
   if (localTasks.length === 0) return <p>No tasks found.</p>;
@@ -83,7 +96,9 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
                 />
 
                 <span
-                  className={`${TaskListStyles.taskTitle(task.completed)} whitespace-pre-wrap break-words`}
+                  className={`${TaskListStyles.taskTitle(task.completed)} ${
+                    task.completed ? "line-through text-gray-400" : ""
+                  } whitespace-pre-wrap break-words`}
                 >
                   {truncatedTitle}
                 </span>
@@ -131,10 +146,10 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
       {selectedTask && (
         <EditTask
           task={selectedTask}
-          isOpen={!!selectedTask}
+          isOpen={Boolean(selectedTask)}
           onClose={closeEditModal}
-          onSave={(updatedTask) => {
-            onUpdateTask(updatedTask);
+          onTaskUpdated={(editedTask) => {
+            onUpdateTask(editedTask);
             closeEditModal();
           }}
         />
@@ -142,11 +157,12 @@ export const TaskList = ({ singleTask, onUpdateTask, onDeleteTask }: TTaskListPr
 
       {taskToDelete && (
         <DeleteTask
+          taskId={taskToDelete.id}
           taskTitle={taskToDelete.title}
-          isOpen={!!taskToDelete}
+          isOpen={Boolean(taskToDelete)}
           onClose={closeDeleteModal}
           onDelete={() => {
-            handleDelete(taskToDelete.id);
+            onDeleteTask(taskToDelete.id);
             closeDeleteModal();
           }}
         />

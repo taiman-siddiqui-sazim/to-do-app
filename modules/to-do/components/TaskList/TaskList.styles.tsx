@@ -9,9 +9,9 @@ export const TaskListStyles = {
   checkbox: "mr-4",
 
   taskTitle: (completed: boolean) =>
-    `text-m font-bold flex-grow ${
-      completed ? "line-through text-gray-600" : "text-gray-800"
-    } whitespace-pre-wrap`,
+    `text-m font-bold flex-grow whitespace-pre-wrap break-words ${
+      completed ? "line-through text-gray-700 font-semibold" : "text-gray-800"
+    }`,
 
   divider: "w-px h-full bg-blue-500 mx-4",
 
@@ -20,7 +20,7 @@ export const TaskListStyles = {
   editButton: (completed: boolean) =>
     `text-xs px-2 py-1 border-black ${
       completed
-        ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+        ? "bg-gray-500 text-gray-200 cursor-not-allowed"
         : "bg-blue-800 text-white hover:bg-blue-600"
     }`,
 

@@ -1,7 +1,8 @@
 import { ITask } from "@/shared/typedefs";
 
 export type TTaskListProps = {
-  singleTask: ITask | null; 
-  onUpdateTask: (task: ITask) => void; 
-  onDeleteTask: (taskId: number) => void; 
+  updatedTask?: ITask; 
+  deletedTaskId?: number; 
+  onDeleteTask: (taskId: number) => void;
+  onUpdateTask: (task: ITask) => void;
 };
