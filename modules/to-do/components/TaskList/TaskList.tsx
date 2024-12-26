@@ -58,7 +58,7 @@ export const TaskList = ({ updatedTask, onDeleteTask, onUpdateTask }: TTaskListP
     try {
       const updatedTask = await updateTaskCompletionInApi(task.id, !task.completed);
       setLocalTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === task.id ? updatedTask : task))
+        prevTasks.map((task_completed) => (task_completed.id === task.id ? updatedTask : task_completed))
       );
     } catch (error) {
       console.error("Error updating task completion:", error);
