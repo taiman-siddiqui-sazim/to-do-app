@@ -21,7 +21,6 @@ export const EditTask = ({ task, isOpen, onClose, onTaskUpdated }: IEditTaskProp
       onClose();
       return;
     }
-
     const validationResult = taskSchema.safeParse({ title });
     if (!validationResult.success) {
       setError(validationResult.error.errors[0].message);
@@ -32,11 +31,8 @@ export const EditTask = ({ task, isOpen, onClose, onTaskUpdated }: IEditTaskProp
     setIsSaving(true);
 
     try {
-      
       const updatedTask = await updateTaskInApi(task.id, validationResult.data.title);
-
       onTaskUpdated(updatedTask);
-
       onClose();
     } catch (err: any) {
       console.error("Error updating task:", err);
