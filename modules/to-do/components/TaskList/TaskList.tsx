@@ -38,7 +38,6 @@ export const TaskList = ({
   useEffect(() => {
     setLocalTasks((prevTasks) => {
       let updatedTasks = [...prevTasks];
-
       if (updatedTask) {
         const taskIndex = updatedTasks.findIndex((task) => task.id === updatedTask.id);
         if (taskIndex >= 0) {
@@ -51,7 +50,6 @@ export const TaskList = ({
       if (deletedTaskId !== undefined) {
         updatedTasks = updatedTasks.filter((task) => task.id !== deletedTaskId); 
       }
-
       return updatedTasks;
     });
   }, [updatedTask, deletedTaskId]);
