@@ -35,7 +35,6 @@ export const EditTask = ({ task, isOpen, onClose, onTaskUpdated }: IEditTaskProp
       
       const updatedTask = await updateTaskInApi(task.id, validationResult.data.title);
 
-      
       onTaskUpdated(updatedTask);
 
       onClose();

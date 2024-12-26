@@ -34,11 +34,11 @@ export const fetchTasksFromApi = async (taskId?: number): Promise<ITask | ITask[
     throw new Error("Failed to fetch tasks");
   } catch (error: any) {
     if (error.response) {
-      throw new Error(error.response.data?.error || "Failed to edit task.");
+      throw new Error(error.response.data?.error || "Failed to fetch tasks.");
     } else if (error.request) {
       throw new Error("No response from server. Please try again.");
     } else {
-      throw new Error("An error occurred while sending the request.");
+      throw new Error("An error occurred while setting up the request.");
     }
   }
 };
