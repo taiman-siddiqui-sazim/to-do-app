@@ -1,63 +1,93 @@
-import { useState } from "react";
-import { TTaskListProps } from "./TaskList.types";
+import { useState, useEffect } from "react";
 import { ITask, MAX_TITLE_LENGTH } from "@/shared/typedefs";
+import { TTaskListProps } from "./TaskList.types";
 import { EditTask } from "../EditTask";
 import { DeleteTask } from "../DeleteTask";
 import { Button, Card } from "@/shared/components/ui";
 import { ExpandModal } from "@/shared/components/ExpandModal";
 import { TaskListStyles } from "./TaskList.styles";
+import { fetchTasksFromApi, updateTaskCompletionInApi } from "@/shared/utils/TaskApi";
 
-export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) => {
+export const TaskList = ({
+  updatedTask,
+  deletedTaskId,
+  onDeleteTask,
+  onUpdateTask,
+}: TTaskListProps) => {
+  const [localTasks, setLocalTasks] = useState<ITask[]>([]);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<ITask | null>(null);
   const [expandedTask, setExpandedTask] = useState<ITask | null>(null);
 
-  const openEditModal = (task: ITask) => {
-    setSelectedTask(task);
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const tasks = await fetchTasksFromApi();
+        const sortedTasks = (tasks as ITask[]).sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        setLocalTasks(sortedTasks as ITask[]);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    setLocalTasks((prevTasks) => {
+      let updatedTasks = [...prevTasks];
+      if (updatedTask) {
+        const taskIndex = updatedTasks.findIndex((task) => task.id === updatedTask.id);
+        if (taskIndex >= 0) {
+          updatedTasks[taskIndex] = updatedTask; 
+        } else {
+          updatedTasks.push(updatedTask); 
+        }
+      }
+
+      if (deletedTaskId !== undefined) {
+        updatedTasks = updatedTasks.filter((task) => task.id !== deletedTaskId); 
+      }
+      return updatedTasks;
+    });
+  }, [updatedTask, deletedTaskId]);
+
+  const openEditModal = (task: ITask) => setSelectedTask(task);
+  const closeEditModal = () => setSelectedTask(null);
+
+  const openDeleteModal = (task: ITask) => setTaskToDelete(task);
+  const closeDeleteModal = () => setTaskToDelete(null);
+
+  const openExpandModal = (task: ITask) => setExpandedTask(task);
+  const closeExpandModal = () => setExpandedTask(null);
+
+  const toggleCompletion = async (task: ITask) => {
+    try {
+      const updatedTask = await updateTaskCompletionInApi(task.id, !task.completed);
+      setLocalTasks((prevTasks) =>
+        prevTasks.map((task_completed) => (task_completed.id === task.id ? updatedTask : task_completed))
+      );
+    } catch (error) {
+      console.error("Error updating task completion:", error);
+    }
   };
 
-  const closeEditModal = () => {
-    setSelectedTask(null);
-  };
-
-  const openDeleteModal = (task: ITask) => {
-    setTaskToDelete(task);
-  };
-
-  const closeDeleteModal = () => {
-    setTaskToDelete(null);
-  };
-
-  const openExpandModal = (task: ITask) => {
-    setExpandedTask(task);
-  };
-
-  const closeExpandModal = () => {
-    setExpandedTask(null);
-  };
-
-  const toggleCompletion = (task: ITask) => {
-    const updatedTask = { ...task, completed: !task.completed };
-    onUpdateTask(updatedTask);
-  };
-
-  if (tasks.length === 0) return null;
+  if (localTasks.length === 0) return <p>No tasks found.</p>;
 
   return (
     <>
       <Card className={TaskListStyles.card}>
         <ul className="space-y-4">
-          {tasks.map((task) => {
+          {localTasks.map((task) => {
             const isLongTask = task.title.length > MAX_TITLE_LENGTH;
             const truncatedTitle = isLongTask
               ? `${task.title.slice(0, MAX_TITLE_LENGTH)}...`
               : task.title;
 
             return (
-              <li
-                key={task.id}
-                className={TaskListStyles.taskItem(task.completed)}
-              >
+              <li key={task.id} className={TaskListStyles.taskItem(task.completed)}>
                 <input
                   type="checkbox"
                   checked={task.completed}
@@ -66,7 +96,9 @@ export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) 
                 />
 
                 <span
-                  className={`${TaskListStyles.taskTitle(task.completed)} whitespace-pre-wrap break-words`}
+                  className={`${TaskListStyles.taskTitle(task.completed)} ${
+                    task.completed ? "line-through text-gray-400" : ""
+                  } whitespace-pre-wrap break-words`}
                 >
                   {truncatedTitle}
                 </span>
@@ -114,10 +146,10 @@ export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) 
       {selectedTask && (
         <EditTask
           task={selectedTask}
-          isOpen={!!selectedTask}
+          isOpen={Boolean(selectedTask)}
           onClose={closeEditModal}
-          onSave={(updatedTask) => {
-            onUpdateTask(updatedTask);
+          onTaskUpdated={(editedTask) => {
+            onUpdateTask(editedTask);
             closeEditModal();
           }}
         />
@@ -125,6 +157,7 @@ export const TaskList = ({ tasks, onUpdateTask, onDeleteTask }: TTaskListProps) 
 
       {taskToDelete && (
         <DeleteTask
+          taskId={taskToDelete.id}
           taskTitle={taskToDelete.title}
           isOpen={Boolean(taskToDelete)}
           onClose={closeDeleteModal}

@@ -1,3 +1,5 @@
+import { ITask } from "@/shared/typedefs";
+
 export type TAddTaskProps = {
-  onSubmit: (task: { title: string }) => void;
+  onTaskAdded: (task: ITask) => void;
 };

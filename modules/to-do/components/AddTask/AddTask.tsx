@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Button, Input } from "@/shared/components/ui";
-import { TAddTaskProps } from "./AddTask.types";
 import { taskSchema } from "@/shared/typedefs";
 import { PopUp } from "@/shared/components/PopUp";
+import { addTaskToApi } from "@/shared/utils/TaskApi";
+import { TAddTaskProps } from "./AddTask.types";
 
-export const AddTask = ({ onSubmit }: TAddTaskProps) => {
+export const AddTask = ({ onTaskAdded }: TAddTaskProps) => {
   const [title, setTitle] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [showPopup, setShowPopup] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     const validationResult = taskSchema.safeParse({ title });
@@ -19,13 +20,23 @@ export const AddTask = ({ onSubmit }: TAddTaskProps) => {
     }
 
     setError(null);
-    const validatedTask = validationResult.data;
-    onSubmit(validatedTask);
 
-    setTitle("");
-    setShowPopup(true);
+    try {
+      const newTask = await addTaskToApi(validationResult.data.title);
 
-    setTimeout(() => setShowPopup(false), 2000);
+      if (newTask?.id) {
+        onTaskAdded(newTask); 
+        setTitle(""); 
+        setShowPopup(true); 
+      } else {
+        throw new Error("Invalid task data returned from API.");
+      }
+
+      setTimeout(() => setShowPopup(false), 2000);
+    } catch (err: any) {
+      console.error("Error adding task:", err);
+      setError(err.message || "Failed to add task.");
+    }
   };
 
   return (
@@ -43,14 +54,15 @@ export const AddTask = ({ onSubmit }: TAddTaskProps) => {
           <Input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(event) => setTitle(event.target.value)}
             placeholder="Enter task title"
             className="text-black font-bold text-lg bg-gray-200 w-full sm:w-96"
           />
         </div>
+
         <Button
           type="submit"
-          className="bg-blue-700 text-white font-bold border-black hover:bg-blue-500 w-full sm:w-auto"
+          className="bg-blue-700 text-white font-bold border-black hover:bg-blue-500 w-full sm:w-auto px-4 py-2 rounded"
         >
           Add Task
         </Button>
