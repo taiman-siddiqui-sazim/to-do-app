@@ -1,16 +1,17 @@
 import axios from "axios";
 import { API_BASE_URL, ITask } from "@/shared/typedefs";
 
-export const addTaskToApi = async (title: string) => {
+export const addTaskToApi = async (title: string): Promise<ITask> => {
   const payload = {
     task: { title, completed: false },
   };
-
+  
   try {
     const response = await axios.post(`${API_BASE_URL}`, payload);
     if (response.status === 201) {
-      return response.data.data; 
+      return response.data.data;
     }
+    throw new Error("Failed to add task");
   } catch (error: any) {
     if (error.response) {
       throw new Error(error.response.data?.error || "Failed to add task.");
@@ -23,33 +24,35 @@ export const addTaskToApi = async (title: string) => {
 };
 
 export const fetchTasksFromApi = async (taskId?: number): Promise<ITask | ITask[]> => {
-    try {
-      const url = taskId ? `${API_BASE_URL}/${taskId}` : API_BASE_URL; // Conditional endpoint
-      const response = await axios.get(url);
-  
-      if (response.status === 200) {
-        return taskId ? response.data.data as ITask : response.data.data as ITask[]; // Explicit typing
-      }
-      throw new Error("Failed to fetch tasks");
-    } catch (error: any) {
-      console.error("Error fetching tasks:", error);
-      throw new Error(
-        error.response?.data?.error || "An error occurred while fetching tasks"
-      );
+  try {
+    const url = taskId ? `${API_BASE_URL}/${taskId}` : API_BASE_URL;
+    const response = await axios.get(url as string);
+    
+    if (response.status === 200) {
+      return taskId ? response.data.data as ITask : response.data.data as ITask[];
     }
-  };  
-  
-  export const deleteTaskFromApi = async (taskId: number): Promise<void> => {
-    try {
-      await axios.delete(`${API_BASE_URL}/${taskId}`);
-    } catch (error: any) {
-      if (error.response) {
-        throw new Error(error.response.data?.error || "Failed to delete task.");
-      } else if (error.request) {
-        throw new Error("No response from server. Please try again.");
-      } else {
-        throw new Error("An error occurred while sending the request.");
-      }
+    throw new Error("Failed to fetch tasks");
+  } catch (error: any) {
+    console.error("Error fetching tasks:", error);
+    throw new Error(
+      error.response?.data?.error || "An error occurred while fetching tasks"
+    );
+  }
+};
+
+export const deleteTaskFromApi = async (taskId: number): Promise<void> => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/${taskId}`);
+    if (response.status !== 204 && response.status !== 200) {
+      throw new Error("Failed to delete task");
     }
-  };  
-  
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data?.error || "Failed to delete task.");
+    } else if (error.request) {
+      throw new Error("No response from server. Please try again.");
+    } else {
+      throw new Error("An error occurred while sending the request.");
+    }
+  }
+};
