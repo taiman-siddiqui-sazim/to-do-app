@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ITask, MAX_TITLE_LENGTH } from "@/shared/typedefs";
 import { TTaskListProps } from "./TaskList.types";
 import { EditTask } from "../EditTask";
@@ -23,10 +23,10 @@ export const TaskList = ({
     const fetchTasks = async () => {
       try {
         const tasks = await fetchTasksFromApi();
-        const sortedTasks = (tasks as ITask[]).sort(
+        const sortedTasks = tasks.sort(
           (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
         );
-        setLocalTasks(sortedTasks as ITask[]);
+        setLocalTasks(sortedTasks);
       } catch (error) {
         console.error("Error fetching tasks:", error);
       }
@@ -36,23 +36,24 @@ export const TaskList = ({
   }, []);
 
   useEffect(() => {
-    setLocalTasks((prevTasks) => {
-      let updatedTasks = [...prevTasks];
-      if (updatedTask) {
-        const taskIndex = updatedTasks.findIndex((task) => task.id === updatedTask.id);
+    if (updatedTask) {
+      setLocalTasks((prevTasks) => {
+        const taskIndex = prevTasks.findIndex((task) => task.id === updatedTask.id);
         if (taskIndex >= 0) {
-          updatedTasks[taskIndex] = updatedTask; 
-        } else {
-          updatedTasks.push(updatedTask); 
+          const updatedTasks = [...prevTasks];
+          updatedTasks[taskIndex] = updatedTask;
+          return updatedTasks;
         }
-      }
+        return [...prevTasks, updatedTask];
+      });
+    }
+  }, [updatedTask]);
 
-      if (deletedTaskId !== undefined) {
-        updatedTasks = updatedTasks.filter((task) => task.id !== deletedTaskId); 
-      }
-      return updatedTasks;
-    });
-  }, [updatedTask, deletedTaskId]);
+  useEffect(() => {
+    if (deletedTaskId !== undefined) {
+      setLocalTasks((prevTasks) => prevTasks.filter((task) => task.id !== deletedTaskId));
+    }
+  }, [deletedTaskId]);
 
   const openEditModal = (task: ITask) => setSelectedTask(task);
   const closeEditModal = () => setSelectedTask(null);
@@ -74,7 +75,7 @@ export const TaskList = ({
     }
   };
 
-  if (localTasks.length === 0) return <p>No tasks found.</p>;
+  if (localTasks.length === 0) return <p className="text-white">No tasks found.</p>;
 
   return (
     <>
@@ -94,7 +95,6 @@ export const TaskList = ({
                   onChange={() => toggleCompletion(task)}
                   className={TaskListStyles.checkbox}
                 />
-
                 <span
                   className={`${TaskListStyles.taskTitle(task.completed)} ${
                     task.completed ? "line-through text-gray-400" : ""
@@ -102,7 +102,6 @@ export const TaskList = ({
                 >
                   {truncatedTitle}
                 </span>
-
                 {isLongTask && (
                   <Button
                     onClick={() => openExpandModal(task)}
@@ -111,9 +110,7 @@ export const TaskList = ({
                     Expand
                   </Button>
                 )}
-
                 <div className={TaskListStyles.divider}></div>
-
                 <div className={TaskListStyles.buttonGroup}>
                   <Button
                     onClick={() => openEditModal(task)}
@@ -134,7 +131,6 @@ export const TaskList = ({
           })}
         </ul>
       </Card>
-
       {expandedTask && (
         <ExpandModal
           content={expandedTask.title}
@@ -142,7 +138,6 @@ export const TaskList = ({
           onClose={closeExpandModal}
         />
       )}
-
       {selectedTask && (
         <EditTask
           task={selectedTask}
@@ -154,7 +149,6 @@ export const TaskList = ({
           }}
         />
       )}
-
       {taskToDelete && (
         <DeleteTask
           taskId={taskToDelete.id}
